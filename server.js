@@ -1,6 +1,7 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
+const passport = require('passport')
 
 const users = require('./routes/api/users')
 const profile = require('./routes/api/profile')
@@ -14,11 +15,11 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 // DB Config
-const db = require('./config/keys').mongoURI
+const {mongoURI} = require('./config/keys')
 
 // Connect to MongoDB
 mongoose
-  .connect(db)
+  .connect(mongoURI)
   .then(() => console.log('Mongodb connected'))
   .catch(err => console.log(err))
 
@@ -26,9 +27,9 @@ app.listen(port, () => {
   console.log(`Server listening on port ${port}`)
 })
 
-app.get('/', (req, res) => {
-  res.send('Hello API world')
-})
+// Passport middleware
+app.use(passport.initialize())
+require('./config/passport')(passport)
 
 // Use routes
 app.use('/api/users', users)
